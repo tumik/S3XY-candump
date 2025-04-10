@@ -39,11 +39,11 @@ class DumpFile:
         self.fileStartTime = ts
 
         # Create the directory if it doesn't exist
-        dir = os.path.join(self.save_dir, date_str)
-        os.makedirs(dir, exist_ok=True)
+        path = os.path.join(self.save_dir, date_str)
+        os.makedirs(path, exist_ok=True)
 
         # Create the filename based on the current time
-        filename = os.path.join(dir, f"{date_str}_{time_str}")
+        filename = os.path.join(path, f"{date_str}_{time_str}")
         
         if self.format == "candump":
             self.file = Candump(filename)

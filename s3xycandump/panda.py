@@ -137,9 +137,9 @@ class Panda:
         for msg in data:
             print(f"    Bus ID: {msg.bus_id:x}, Frame ID: {msg.frame_id:03x}, Frame length: {len(msg.frame_data)}, Data: {msg.frame_data.hex()}")
 
-    def printStats(self, len):
+    def printStats(self, count):
         # Print stats every 1 minute, exactly when wall clock minute has changed
-        self.statsPacketCount += len
+        self.statsPacketCount += count
         if self.lastStatsPrint is None:
             self.lastStatsPrint = datetime.datetime.now()
             return
