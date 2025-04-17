@@ -6,7 +6,7 @@ import datetime
 from s3xycandump.canmsg import CanMsg
 
 class Panda:
-    def __init__(self, ip, port, candb, subscribeList=[]):
+    def __init__(self, ip, port, candb=None, subscribeList=[]):
         self.ip = ip
         self.port = port
         self.candb = candb
@@ -16,6 +16,12 @@ class Panda:
         self.lastRecv = None
         self.lastStatsPrint = None
         self.statsPacketCount = 0
+
+        # If subscribelist is defined, no need for candb
+        if len(self.subscribeList) > 0:
+            if candb is not None:
+                print("WARNING: Candb is not used when subscribelist is defined. Ignoring candb.")
+                self.candb = None
 
     def reconnect(self):
         """
@@ -63,10 +69,13 @@ class Panda:
             self.subscribeList = [x.frame_id for x in self.candb.messages]
         
         for item in self.subscribeList:
-            if isinstance(item, str):
-                frameId = self.candb.get_message_by_name(item).frame_id
-            else:
-                frameId = item
+            frameId = item
+            if not isinstance(frameId, int):
+                print(f"Invalid frame ID: {frameId}. Must be an integer.")
+                continue
+            if frameId < 0 or frameId > 0x7FF:
+                print(f"Invalid frame ID: {frameId}. Must be between 0 and 2047 (0x7FF, 11 bits).")
+                continue
             # A maximum of 43 bus id/frame id pairs can be sent per packet
             if len(subPacket) > 1 + (3*42):
                 self.sock.sendto(subPacket, (self.ip, self.port))
