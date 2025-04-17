@@ -122,6 +122,10 @@ class Panda:
             frame_data = frameData
         )
 
+        if self.lastRecv is None:
+            print(f"Received first CAN frame at unix TS {msg.ts_unix}!")
+            print(f"    Bus ID: 0x{msg.bus_id:x}, Frame ID: 0x{msg.frame_id:03x}, Frame length: {len(msg.frame_data)}, Data: 0x{msg.frame_data.hex()}")
+        self.lastRecv = msg.ts_unix
         return msg
 
     def parseLoop(self, data):
@@ -144,7 +148,7 @@ class Panda:
     def debugPrint(self, data):
         print(f"Successfully parsed a packet with {len(data)} CAN messages:")
         for msg in data:
-            print(f"    Bus ID: {msg.bus_id:x}, Frame ID: {msg.frame_id:03x}, Frame length: {len(msg.frame_data)}, Data: {msg.frame_data.hex()}")
+            print(f"    Bus ID: 0x{msg.bus_id:x}, Frame ID: 0x{msg.frame_id:03x}, Frame length: {len(msg.frame_data)}, Data: 0x{msg.frame_data.hex()}")
 
     def printStats(self, count):
         # Print stats every 1 minute, exactly when wall clock minute has changed
@@ -170,7 +174,6 @@ class Panda:
         while True:
             try:
                 data, addr = self.sock.recvfrom(65535)
-                self.lastRecv = time.time()
                 msgList = self.parseLoop(data)
                 #self.debugPrint(msgList)
                 self.printStats(len(msgList))
